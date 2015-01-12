@@ -68,3 +68,29 @@ def present(name, value):
         ret['comment'] = 'Key "%s" updated with value "%s"' % (name, value)
     
     return ret
+
+
+def absent(name, recurse=False):
+    '''
+    Ensure that the named key does not exist in consul 
+
+    name
+        consul key to manage
+
+    value
+        Data to persist in key
+    '''
+    ret = {'name': name,
+           'changes': {},
+           'result': True,
+           'comment': 'Key(s) specified already absent'}
+
+    if not __salt__['consul.key_get'](name):
+        ret['comment'] = 'Key "%s" does not exist' % (name)
+
+    else:
+        __salt__['consul.key_delete'](name)
+        ret['changes'][name] = 'Value updated'
+        ret['comment'] = 'Key "%s" deleted' % (name)
+    
+    return ret
