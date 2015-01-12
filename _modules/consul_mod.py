@@ -11,7 +11,6 @@ Execution module to provide consul functionality to Salt
 
     consul.host: 'localhost'
     consul.port: 8500
-    consul.token: None
     consul.consistency: 'default'
 '''
 
@@ -47,6 +46,7 @@ def _connect(host='localhost', port=8500, consistency='default'):
         consistency = __salt__['config.option']('consul.consistency')
     return consul.Consul(host, port, consistency)
 
+
 def key_delete(key, recurse=None):
     '''
     Deletes the keys from consul, returns number of keys deleted
@@ -55,7 +55,7 @@ def key_delete(key, recurse=None):
 
     .. code-block:: bash
 
-        salt '*' consul.delete foo
+        salt '*' consul.key_delete foo
     '''
     # Get connection args from keywords if set
 
@@ -67,7 +67,6 @@ def key_delete(key, recurse=None):
         return c.kv.delete(key, recurse)
 
 
-
 def key_exists(key):
     '''
     Return true if the key exists in consul
@@ -76,7 +75,7 @@ def key_exists(key):
 
     .. code-block:: bash
 
-        salt '*' consul.exists foo
+        salt '*' consul.key_exists foo
     '''
     c = _connect()
     index, data = c.kv.get(key)
@@ -94,7 +93,7 @@ def key_get(key):
 
     .. code-block:: bash
 
-        salt '*' consul.exists foo
+        salt '*' consul.key_get foo
     '''
     c = _connect()
     index, data = c.kv.get(key)
@@ -112,11 +111,77 @@ def key_put(key, value):
 
     .. code-block:: bash
 
-        salt '*' consul.exists foo
+        salt '*' consul.key_put foo bar
     '''
     c = _connect()
     c.kv.put(key, value)
     index, data = c.kv.get(key)
     return data['Value']
+
+
+def service_list():
+    '''
+    List services known to Consul
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.service_list
+    '''
+    c = _connect()
+    services = []
+    for service, data in c.agent.services().items():
+        services.append(service)
+    return services
+
+
+def service_get(name):
+    '''
+    Get a Consul service's details
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.service_get
+    '''
+    c = _connect()
+    for service, data in c.agent.services().items():
+        if name == service:
+            return data
+    return False
+
+
+def service_register(name, service_id=None, port=None, tags=None, script=None, interval=None, ttl=None):
+    '''
+    Register service with Consul
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.service_register foo
+    '''
+    c = _connect()
+    return c.agent.service.register(name, service_id, port, tags, script, interval, ttl)
+
+
+def service_deregister(name):
+    '''
+    Deregister service from Consul
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.service_deregister foo
+    '''
+    c = _connect()
+    if name not in service_list():
+        return False
+    return c.agent.service.deregister(name)
+
+
 
 

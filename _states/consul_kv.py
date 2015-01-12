@@ -94,3 +94,4 @@ def absent(name, recurse=False):
         ret['comment'] = 'Key "%s" deleted' % (name)
     
     return ret
+    
