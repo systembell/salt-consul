@@ -153,7 +153,7 @@ def service_get(name):
     return False
 
 
-def service_register(name, service_id=None, port=None, tags=None, script=None, interval=None):
+def service_register(name, service_id=None, port=None, tags=None, script=None, interval=None, ttl=None):
     '''
     Register service with Consul
 
@@ -164,7 +164,7 @@ def service_register(name, service_id=None, port=None, tags=None, script=None, i
         salt '*' consul.service_register foo
     '''
     c = _connect()
-    return c.agent.service.register(name, service_id, port, tags, script, interval)
+    return c.agent.service.register(name, service_id, port, tags, script, interval, ttl)
 
 
 def service_deregister(name):
