@@ -26,6 +26,16 @@ Consul modules for SaltStack
 
 `salt-call consul.service_deregister name=foo`
 
+#### Checks
+
+`salt-call consul.check_list`
+
+`salt-call consul.check_get foo`
+
+`salt-call consul.check_register name=foo script=/path/to/script interval=10s`
+
+`salt-call consul.check_deregister name=foo`
+
 ### State module examples:
 
 #### Key/Value
@@ -53,6 +63,20 @@ consul-service-present:
 
 consul-service-absent:
     consul_service.absent:
+        - name: foo
+```
+
+#### Checks
+
+```yaml
+consul-check-present:
+    consul_check.present:
+        - name: foo
+        - script: nz -z localhost 6969
+        - interval: 10s
+
+consul-check-absent:
+    consul_check.absent:
         - name: foo
 ```
 
