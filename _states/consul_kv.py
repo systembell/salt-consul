@@ -14,20 +14,6 @@ Management of consul server
       consul_kv.present:
         - value: data
 
-The consul server information specified in the minion config file can be
-overridden in states using the following arguments: ``host``, ``port``, ``token``,
-``consistency``.
-
-.. code-block:: yaml
-
-
-    key_in_consul:
-      consul_kv.present:
-        - value: data
-        - host: localhost
-        - port: 8500
-        - token: None
-        - consistency: 'default'
 '''
 
 __virtualname__ = 'consul_kv'
