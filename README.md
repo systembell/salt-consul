@@ -84,7 +84,13 @@ consul-check-absent:
 
 ## TODO
 
-- service / check registration
-- health status monitoring
+- include access to all api functions in python-consul
+- ttls
+- acls
+
+## Contributing
+- fork
+- code
+- submit pr
 
 
