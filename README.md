@@ -30,11 +30,30 @@ Consul modules for SaltStack
 
 #### Key/Value
 
-```
+```yaml
 consul-key-present:
     consul_kv.present:
         - name: foo
         - value: bar
+
+consul-key-absent:
+    consul_kv.absent:
+        - name: foo
+```
+
+#### Services
+
+```yaml
+consul-service-present:
+    consul_service.present:
+        - name: foo
+        - port: 6969
+        - script: nc -z localhost 6969
+        - interval: 10s
+
+consul-service-absent:
+    consul_service.absent:
+        - name: foo
 ```
 
 ## TODO
