@@ -6,7 +6,9 @@ Consul modules for SaltStack
 `python-consul` is a requisite for these modules.
 
 
-Execution module example:
+### Execution module examples:
+
+#### Key/Value
 
 `salt-call consul.key_put foo bar`
 
@@ -14,8 +16,19 @@ Execution module example:
 
 `salt-call consul.key_delete foo`
 
+#### Services
 
-State module example:
+`salt-call consul.service_list`
+
+`salt-call consul.service_get foo`
+
+`salt-call consul.service_register name=foo port=6969 script=/path/to/script interval=10s`
+
+`salt-call consul.service_deregister name=foo`
+
+### State module examples:
+
+#### Key/Value
 
 ```
 consul-key-present:
@@ -23,3 +36,10 @@ consul-key-present:
         - name: foo
         - value: bar
 ```
+
+## TODO
+
+- service / check registration
+- health status monitoring
+
+
