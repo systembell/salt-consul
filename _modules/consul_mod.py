@@ -246,3 +246,22 @@ def check_deregister(name):
         return False
     return c.agent.check.deregister(name)
 
+
+def get_service_status(name,index=None, passing=None):
+    '''
+    Get the health status of a service in Consul
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.get_service_status
+    '''
+    c = _connect()
+    index, nodes = c.health.service(name, index, passing)
+    node_list = []
+    for node in nodes:
+        for check in node['Checks']:
+            if name == check['ServiceName']:
+                node_list.append({check['Node']: check['Status']})
+    return node_list
