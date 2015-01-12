@@ -1,9 +1,10 @@
 # salt-consul
 Consul modules for SaltStack
 
-## Prerequisites
+## Quickstart
 
-`python-consul` is a requisite for these modules.
+- drop the modules into `{_modules,_states}` into `file_roots` on your `salt-master`
+- ensure the pypi `python-consul` package is installed
 
 
 ### Execution module examples:
