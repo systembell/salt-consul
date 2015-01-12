@@ -10,24 +10,17 @@ Management of consul server
 
 .. code-block:: yaml
 
-    key_in_consul:
-      consul_kv.present:
-        - value: data
+    service_in_consul:
+        consul_service.present:
+            - name: foo
+            - port: 6969
+            - script: nc -z localhost 6969
+            - interval: 10s
 
-The consul server information specified in the minion config file can be
-overridden in states using the following arguments: ``host``, ``port``, ``token``,
-``consistency``.
+    service_not_in_consul:
+        consul_service.absent:
+            - name: foo
 
-.. code-block:: yaml
-
-
-    key_in_consul:
-      consul_kv.present:
-        - value: data
-        - host: localhost
-        - port: 8500
-        - token: None
-        - consistency: 'default'
 '''
 
 __virtualname__ = 'consul_service'

@@ -155,7 +155,7 @@ def service_get(name):
 
 def service_register(name, service_id=None, port=None, tags=None, script=None, interval=None, ttl=None):
     '''
-    Register service with Consul
+    Register a service with Consul
 
     CLI Example:
 
@@ -169,7 +169,7 @@ def service_register(name, service_id=None, port=None, tags=None, script=None, i
 
 def service_deregister(name):
     '''
-    Deregister service from Consul
+    Deregister a service from Consul
 
     CLI Example:
 
@@ -183,5 +183,66 @@ def service_deregister(name):
     return c.agent.service.deregister(name)
 
 
+def check_list():
+    '''
+    List checks known to Consul
 
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.check_list
+    '''
+    c = _connect()
+    checks = []
+    for check, data in c.agent.checks().items():
+        checks.append(check)
+    return checks
+
+
+def check_get(name):
+    '''
+    Get the details of a check in Consul
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.check_get
+    '''
+    c = _connect()
+    for check, data in c.agent.checks().items():
+        if name == check:
+            return data
+    return False
+
+
+def check_register(name, check_id=None, script=None, interval=None, ttl=None, notes=None):
+    '''
+    Register a check with Consul
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.check_register foo
+    '''
+    c = _connect()
+    return c.agent.check.register(name, check_id, script, interval, ttl, notes)
+
+
+def check_deregister(name):
+    '''
+    Deregister a check from Consul
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.check_deregister foo
+    '''
+    c = _connect()
+    if name not in check_list():
+        return False
+    return c.agent.check.deregister(name)
 
