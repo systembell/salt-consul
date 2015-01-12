@@ -26,6 +26,8 @@ Consul modules for SaltStack
 
 `salt-call consul.service_deregister name=foo`
 
+`salt-call consul.get_service_status name=foo`
+
 #### Checks
 
 `salt-call consul.check_list`
