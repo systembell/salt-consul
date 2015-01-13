@@ -15,18 +15,18 @@ Execution module to provide consul functionality to Salt
 '''
 
 # Import third party libs
+HAS_CONSUL = False
 try:
     import consul as consul
     HAS_CONSUL = True
 except ImportError:
-    HAS_CONSUl = False
-
-__virtualname__ = 'consul'
+    pass
 
 
 def __virtual__():
     '''
-    Only load this module if consul python module is installed
+    Only load this module if keystone
+    is installed on this minion.
     '''
     if HAS_CONSUL:
         return __virtualname__
