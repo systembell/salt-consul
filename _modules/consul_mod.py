@@ -22,6 +22,7 @@ try:
 except ImportError:
     pass
 
+__virtualname__ = 'consul'
 
 def __virtual__():
     '''
