@@ -25,7 +25,7 @@ except ImportError:
 
 def __virtual__():
     '''
-    Only load this module if keystone
+    Only load this module if python-consul
     is installed on this minion.
     '''
     if HAS_CONSUL:
