@@ -149,10 +149,10 @@ def service_get(name, dc=None, tag=None, index=None):
         salt '*' consul.service_get
     '''
     c = _connect()
-    index, service = c.agent.service(name, dc, tag, index)
-    if not service:
-        return False
-    return service
+    for service, data in c.agent.services().items():
+        if name == service:
+            return data
+    return False
 
 
 def service_register(name, service_id=None, port=None, tags=None, script=None, interval=None, ttl=None):
