@@ -1,6 +1,9 @@
 # salt-consul
 Consul modules for SaltStack
 
+## Background
+I'd been meaning to write this for awhile, then one afternoon just decided I didn't want to lay down json for every service & check, not to mention reload the service. Still a work in progress, but most of the functions I use are represented here.
+
 ## Quickstart
 
 - drop the modules into `{_modules,_states}` into `file_roots` on your `salt-master`
@@ -38,6 +41,23 @@ Consul modules for SaltStack
 `salt-call consul.check_register name=foo script=/path/to/script interval=10s`
 
 `salt-call consul.check_deregister name=foo`
+
+#### Nodes
+
+`salt-call consul.node_list`
+
+`salt-call consul.node_get foo`
+
+#### ttls
+
+`salt-call consul.ttl_pass foo type=service notes=bar`
+
+`salt-call consul.ttl_fail foo type=check notes=bar`
+
+`salt-call consul.ttl_warn foo notes=bar`
+
+
+
 
 ### State module examples:
 
@@ -83,10 +103,25 @@ consul-check-absent:
         - name: foo
 ```
 
+#### ttls
+
+```yaml
+consul-set-service-ttl:
+    consul_service.ttl_set:
+        - name: foo
+        - status: failing
+        - notes: bar
+
+consul-set-check-ttl:
+    consul_check.ttl_set:
+        - name: foo
+        - status: failing
+        - notes: bar
+```
+
+
 ## TODO
 
-- include access to all api functions in python-consul
-- ttls
 - acls
 
 ## Contributing
