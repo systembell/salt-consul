@@ -90,4 +90,41 @@ def absent(name):
         __salt__['consul.check_deregister'](name)
     
     return ret
+
+
+def ttl_set(name, status, notes=None):
+    '''
+    Update a ttl-based service check to either passing, warning, or failing
+
+    name
+        consul service to manage
+
+    status
+        passing, warning, or failing
+
+    notes
+        optional notes for operators
+        
+    '''
+
+    type = 'check'
+
+    ret = {'name': name,
+           'changes': {},
+           'result': True,
+           'comment': 'Check set to %s' % (status)}
+
+    statuses = ['passing', 'warning', 'failing']
+
+    if not __salt__['consul.service_get'](name):
+        ret['comment'] = 'Check does not exist' % (name)
+
+    if status not in statuses:
+        ret['result'] = False
+        ret['comment'] = 'Check must be one of: %s' % (" ".join(s))
+        
+    else:
+        __salt__['consul.ttl_' + status[:-3] ](name, type, notes)
+    
+    return ret
     
