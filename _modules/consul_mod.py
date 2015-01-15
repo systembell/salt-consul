@@ -2,6 +2,11 @@
 '''
 Execution module to provide consul functionality to Salt
 
+:maintainer: Aaron Bell <aarontbellgmail.com>
+:maturity: new
+:depends:    - python-consul (http://python-consul.readthedocs.org/en/latest/)
+:platform: Linux
+
 .. versionadded:: 2014.7.0
 
 :configuration: This module requires the python-consul python module and uses the
@@ -23,6 +28,7 @@ except ImportError:
     pass
 
 __virtualname__ = 'consul'
+
 
 def __virtual__():
     '''
@@ -120,24 +126,24 @@ def key_put(key, value):
     return data['Value']
 
 
-def service_list():
+def service_list(catalog=False, dc=None, index=None):
     '''
     List services known to Consul
-
     CLI Example:
-
     .. code-block:: bash
-
         salt '*' consul.service_list
     '''
     c = _connect()
     services = []
-    for service, data in c.agent.services().items():
-        services.append(service)
+    if catalog:
+        index, services = c.catalog.services(dc, index)
+    else:
+        for service, data in c.agent.services().items():
+            services.append(service)
     return services
 
 
-def service_get(name):
+def service_get(name, dc=None, tag=None, index=None):
     '''
     Get a Consul service's details
 
@@ -266,3 +272,107 @@ def get_service_status(name,index=None, passing=None):
             if name == check['ServiceName']:
                 node_list.append({check['Node']: check['Status']})
     return node_list
+
+
+def node_list():
+    '''
+    List nodes in Consul
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.node_list
+    '''
+    c = _connect()
+    node_list = []
+    index, nodes = c.catalog.nodes()
+    for node in nodes:    
+        node_list.append({node['Node']: node['Address']})
+    return node_list
+
+
+def node_get(name, dc=None, tag=None, index=None):
+    '''
+    Get a Consul node's details
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.node_get
+    '''
+    c = _connect()
+    index, node = c.catalog.node(name, dc, tag, index)
+    if not node:
+        return False
+    return node
+
+
+def dc_list():
+    '''
+    List datacenters in Consul
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.dc_list
+    '''
+    c = _connect()
+    return c.catalog.datacenters()
+
+
+def ttl_pass(name, notes=None, type='check'):
+    '''
+    Mark a ttl-based service or check as passing
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.ttl_pass foo type=check
+        
+        salt '*' consul.ttl_pass foo type=service
+    '''
+    c = _connect()
+    if type == 'service':
+        name = 'service:' + name
+    return c.agent.check.ttl_pass(name, notes)
+
+
+def ttl_warn(name, notes=None, type='check'):
+    '''
+    Mark a ttl-based service or check as warning
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.ttl_warn foo type=check
+        
+        salt '*' consul.ttl_warn foo type=service
+    '''
+    c = _connect()
+    if type == 'service':
+        name = 'service:' + name
+    return c.agent.check.ttl_warn(name, notes)
+
+
+def ttl_fail(name, notes=None, type='check'):
+    '''
+    Mark a ttl-based service or check as failing
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.ttl_fail foo type=check
+        
+        salt '*' consul.ttl_fail foo type=service
+    '''
+    c = _connect()
+    if type == 'service':
+        name = 'service:' + name
+    return c.agent.check.ttl_fail(name, notes)
+
