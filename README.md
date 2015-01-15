@@ -1,6 +1,9 @@
 # salt-consul
 Consul modules for SaltStack
 
+## Background
+I'd been meaning to write this for awhile, then one afternoon just decided I didn't want to lay down json for every service & check, not to mention reload the service. Still a work in progress, but most of the functions I use are represented here.
+
 ## Quickstart
 
 - drop the modules into `{_modules,_states}` into `file_roots` on your `salt-master`
