@@ -2,6 +2,11 @@
 '''
 Execution module to provide consul functionality to Salt
 
+:maintainer: Aaron Bell <aarontbellgmail.com>
+:maturity: new
+:depends:    - python-consul (http://python-consul.readthedocs.org/en/latest/)
+:platform: Linux
+
 .. versionadded:: 2014.7.0
 
 :configuration: This module requires the python-consul python module and uses the

@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 '''
-Management of consul server
+Management of consul checks
 ==========================
+
+:maintainer: Aaron Bell <aarontbellgmail.com>
+:maturity: new
+:depends:    - python-consul (http://python-consul.readthedocs.org/en/latest/)
+:platform: Linux
 
 .. versionadded:: 2014.7.0
 
