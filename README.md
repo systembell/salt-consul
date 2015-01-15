@@ -39,6 +39,23 @@ Consul modules for SaltStack
 
 `salt-call consul.check_deregister name=foo`
 
+#### Nodes
+
+`salt-call consul.node_list`
+
+`salt-call consul.node_get foo`
+
+#### ttls
+
+`salt-call consul.ttl_pass foo type=service notes=bar`
+
+`salt-call consul.ttl_fail foo type=check notes=bar`
+
+`salt-call consul.ttl_warn foo notes=bar`
+
+
+
+
 ### State module examples:
 
 #### Key/Value
@@ -83,10 +100,25 @@ consul-check-absent:
         - name: foo
 ```
 
+#### ttls
+
+```yaml
+consul-set-service-ttl:
+    consul_service.ttl_set:
+        - name: foo
+        - status: failing
+        - notes: bar
+
+consul-set-check-ttl:
+    consul_check.ttl_set:
+        - name: foo
+        - status: failing
+        - notes: bar
+```
+
+
 ## TODO
 
-- include access to all api functions in python-consul
-- ttls
 - acls
 
 ## Contributing
