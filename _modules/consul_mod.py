@@ -19,7 +19,8 @@ Execution module to provide consul functionality to Salt
     consul.consistency: 'default'
 '''
 
-# Import third party libs
+import json
+
 HAS_CONSUL = False
 try:
     import consul as consul
@@ -107,7 +108,7 @@ def key_get(key):
     if not data:
         return False
     else:
-        return data['Value']
+        return json.loads(data['Value'])
 
 
 def key_put(key, value):
@@ -121,9 +122,9 @@ def key_put(key, value):
         salt '*' consul.key_put foo bar
     '''
     c = _connect()
-    c.kv.put(key, value)
+    c.kv.put(key, json.dumps(value))
     index, data = c.kv.get(key)
-    return data['Value']
+    return json.loads(data['Value'])
 
 
 def service_list(catalog=False, dc=None, index=None):
