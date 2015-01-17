@@ -16,12 +16,23 @@ Management of consul key/value
 .. code-block:: yaml
 
     key_in_consul:
-      consul_kv.present:
-        - value: data
+        consul_key.present:
+            - name: foo
+            - value: data
 
+The consul server information in the minion config file can be
+overridden in states using the following arguments: ``host``, ``post``, ``consistency``,
+``password``.
+.. code-block:: yaml
+    key_in_consul:
+      consul_key.present:
+        - name: foo
+        - value: bar
+        - host: hostname.consul
+        - port: 6969
 '''
 
-__virtualname__ = 'consul_kv'
+__virtualname__ = 'consul_key'
 
 
 def __virtual__():
@@ -33,7 +44,7 @@ def __virtual__():
     return False
 
 
-def present(name, value):
+def present(name, value, **kwargs):
     '''
     Ensure that the named key exists in consul with the value specified
 
@@ -48,20 +59,20 @@ def present(name, value):
            'result': True,
            'comment': 'Key already set to defined value'}
 
-    if not __salt__['consul.key_get'](name):
-        __salt__['consul.key_put'](name, value)
+    if not __salt__['consul.key_get'](name, **kwargs):
+        __salt__['consul.key_put'](name, value, **kwargs)
         ret['changes'][name] = 'Key created'
         ret['comment'] = 'Key "%s" set with value "%s"' % (name, value)
 
-    elif __salt__['consul.key_get'](name) != value:
-        __salt__['consul.key_put'](name, value)
+    elif __salt__['consul.key_get'](name, **kwargs) != value:
+        __salt__['consul.key_put'](name, value, **kwargs)
         ret['changes'][name] = 'Value updated'
         ret['comment'] = 'Key "%s" updated with value "%s"' % (name, value)
     
     return ret
 
 
-def absent(name, recurse=False):
+def absent(name, recurse=False, **kwargs):
     '''
     Ensure that the named key does not exist in consul 
 
@@ -76,11 +87,11 @@ def absent(name, recurse=False):
            'result': True,
            'comment': 'Key(s) specified already absent'}
 
-    if not __salt__['consul.key_get'](name):
+    if not __salt__['consul.key_get'](name, **kwargs):
         ret['comment'] = 'Key "%s" does not exist' % (name)
 
     else:
-        __salt__['consul.key_delete'](name)
+        __salt__['consul.key_delete'](name, **kwargs)
         ret['changes'][name] = 'Value updated'
         ret['comment'] = 'Key "%s" deleted' % (name)
     
