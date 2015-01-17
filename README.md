@@ -65,12 +65,12 @@ I'd been meaning to write this for awhile, then one afternoon just decided I did
 
 ```yaml
 consul-key-present:
-    consul_kv.present:
+    consul_key.present:
         - name: foo
         - value: bar
 
 consul-key-absent:
-    consul_kv.absent:
+    consul_key.absent:
         - name: foo
 ```
 
