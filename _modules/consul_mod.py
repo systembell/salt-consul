@@ -123,12 +123,12 @@ def key_put(key, value, value_from_file=False, encoding='utf8', **kwargs):
         if not os.path.isfile(value):
             ret = {}
             ret['result'] = False
-            ret['comment'] = path + " does not exist"
+            ret['comment'] = value + " does not exist"
 
         if not salt.utils.istextfile(value):
             ret = {}
             ret['result'] = False
-            ret['comment'] = path + " is not a text file"
+            ret['comment'] = value + " is not a text file"
 
         else:
             file_contents = codecs.open(value, 'rb', encoding=encoding).read()
