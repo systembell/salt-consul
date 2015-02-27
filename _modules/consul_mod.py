@@ -14,6 +14,10 @@ Execution module to provide consul functionality to Salt
     consul.consistency: 'default'
 '''
 
+import os
+import salt.utils
+import codecs
+
 # Import third party libs
 HAS_CONSUL = False
 try:
@@ -103,7 +107,7 @@ def key_get(key, **kwargs):
         return data['Value']
 
 
-def key_put(key, value, **kwargs):
+def key_put(key, value, value_from_file=False, encoding='utf8', **kwargs):
     '''
     Sets the value of a key in consul
 
@@ -114,7 +118,25 @@ def key_put(key, value, **kwargs):
         salt '*' consul.key_put foo bar
     '''
     c = _connect(**kwargs)
-    c.kv.put(key, value)
+
+    if value_from_file:
+        if not os.path.isfile(value):
+            ret = {}
+            ret['result'] = False
+            ret['comment'] = path + " does not exist"
+
+        if not salt.utils.istextfile(value):
+            ret = {}
+            ret['result'] = False
+            ret['comment'] = path + " is not a text file"
+
+        else:
+            file_contents = codecs.open(value, 'rb', encoding=encoding).read()
+            c.kv.put(key, file_contents)
+
+    else:
+        c.kv.put(key, value)
+
     index, data = c.kv.get(key)
     return data['Value']
 
