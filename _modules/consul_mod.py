@@ -12,6 +12,7 @@ Execution module to provide consul functionality to Salt
     consul.host: 'localhost'
     consul.port: 8500
     consul.consistency: 'default'
+    consul.token: 'ySsVJuvjBOZzqnP5zVPs3A=='
 '''
 
 import os
@@ -40,7 +41,7 @@ def __virtual__():
         return False
 
 
-def _connect(host='localhost', port=8500, consistency='default', **kwargs):
+def _connect(host='localhost', port=8500, consistency='default', token=None, **kwargs):
     '''
     Returns an instance of the consul client
     '''
@@ -50,6 +51,8 @@ def _connect(host='localhost', port=8500, consistency='default', **kwargs):
         port = __salt__['config.option']('consul.port')
     if not consistency:
         consistency = __salt__['config.option']('consul.consistency')
+    if not token:
+        token = __salt__['config.option']('consul.token')
     return consul.Consul(host, port, consistency)
 
 
@@ -390,4 +393,108 @@ def ttl_fail(name, notes=None, type='check', **kwargs):
     if type == 'service':
         name = 'service:' + name
     return c.agent.check.ttl_fail(name, notes)
+
+
+def acl_create(master_token, rules, name=None, type='client', **kwargs):
+    '''
+    Create an ACL token with supplied rules
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.create master_token=master_token rules='key "" { policy = "read" }'
+    '''
+    kwargs = salt.utils.clean_kwargs()
+    c = consul.Consul(token=master_token, **kwargs)
+    token = c.acl.create(rules=rules)
+    return token
+
+
+def acl_list(master_token, **kwargs):
+    '''
+    List ACLs
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.acl_list master_token=master_token
+    '''
+    kwargs = salt.utils.clean_kwargs()
+    c = consul.Consul(token=master_token, **kwargs)
+    acls = []
+    for acl in c.acl.list():
+        acls.append({acl['ID']: {"Name": acl['Name'], "Rules": acl['Rules'] } })
+    return acls
+
+
+def acl_get(acl_id, master_token, **kwargs):
+    '''
+    Get details about an ACL
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.acl_get acl_id=d6d5653f-8062-4aa2-9caa-9c2b4c3b1102 master_token=master_token
+    '''
+    kwargs = salt.utils.clean_kwargs()
+    c = consul.Consul(token=master_token, **kwargs)
+    return c.acl.info(acl_id)    
+
+
+def acl_clone(acl_id, master_token, **kwargs):
+    '''
+    Clone an ACL
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.acl_clone acl_id=d6d5653f-8062-4aa2-9caa-9c2b4c3b1102 master_token=master_token
+    '''
+    kwargs = salt.utils.clean_kwargs()
+    c = consul.Consul(token=master_token, **kwargs)
+    if not acl_get(acl_id, master_token=master_token):
+        return False
+    else:
+        return c.acl.clone(acl_id)
+
+
+def acl_destroy(acl_id, master_token, **kwargs):
+    '''
+    Destroy an ACL
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.acl_destroy acl_id=d6d5653f-8062-4aa2-9caa-9c2b4c3b1102 master_token=master_token
+    '''
+    kwargs = salt.utils.clean_kwargs()
+    c = consul.Consul(token=master_token, **kwargs)
+    if not acl_get(acl_id, master_token=master_token):
+        return False
+    else:
+        return c.acl.destroy(acl_id)
+        
+
+def acl_update(acl_id, master_token, rules=None, name=None, type='client', **kwargs):
+    '''
+    Updates an ACL
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' consul.acl_update acl_id=efdce837-e9c2-a197-4379-41c5ce1cfac2 master_token=master_token rules='key "" { policy = "read" }'
+    '''
+    kwargs = salt.utils.clean_kwargs()
+    c = consul.Consul(token=master_token, **kwargs)
+    if not acl_get(acl_id, master_token=master_token):
+        return False
+    else:
+        c.acl.update(acl_id=acl_id, rules=rules, name=name, type=type)
+        return True
 
