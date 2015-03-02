@@ -407,6 +407,7 @@ def acl_create(master_token, rules, name=None, type='client', **kwargs):
     '''
     kwargs = salt.utils.clean_kwargs()
     c = consul.Consul(token=master_token, **kwargs)
+    rules = ' '.join(rules.split())
     token = c.acl.create(rules=rules)
     return token
 
@@ -478,7 +479,7 @@ def acl_destroy(acl_id, master_token, **kwargs):
         return False
     else:
         return c.acl.destroy(acl_id)
-        
+
 
 def acl_update(acl_id, master_token, rules=None, name=None, type='client', **kwargs):
     '''
@@ -492,9 +493,14 @@ def acl_update(acl_id, master_token, rules=None, name=None, type='client', **kwa
     '''
     kwargs = salt.utils.clean_kwargs()
     c = consul.Consul(token=master_token, **kwargs)
+    if rules:
+        rules = ' '.join(rules.split())
+
     if not acl_get(acl_id, master_token=master_token):
         return False
     else:
         c.acl.update(acl_id=acl_id, rules=rules, name=name, type=type)
         return True
+
+
 
