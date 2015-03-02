@@ -56,7 +56,17 @@ I'd been meaning to write this for awhile, then one afternoon just decided I did
 
 `salt-call consul.ttl_warn foo notes=bar`
 
+#### ACLs
 
+`salt-call consul.acl_create master_token=master_token rules='key "" { policy = "read" }'`
+
+`salt-call consul.acl_list master_token=master_token`
+
+`salt-call consul.acl_get acl_id=e02be371-60c3-ed74-56a3-c325a86f36e3 master_token=master_token`
+
+`salt-call consul.acl_update acl_id=e02be371-60c3-ed74-56a3-c325a86f36e3 name=foo type=management master_token=master_token`
+
+`salt-call consul.acl_destroy acl_id=e02be371-60c3-ed74-56a3-c325a86f36e3`
 
 
 ### State module examples:
