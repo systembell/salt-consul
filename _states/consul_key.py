@@ -34,6 +34,8 @@ overridden in states using the following arguments: ``host``, ``post``, ``consis
 
 __virtualname__ = 'consul_key'
 
+import os
+import salt.utils
 
 def __virtual__():
     '''
@@ -44,7 +46,7 @@ def __virtual__():
     return False
 
 
-def present(name, value, **kwargs):
+def present(name, value, value_from_file=False, **kwargs):
     '''
     Ensure that the named key exists in consul with the value specified
 
@@ -59,13 +61,30 @@ def present(name, value, **kwargs):
            'result': True,
            'comment': 'Key already set to defined value'}
 
+    if value_from_file:
+        if not os.path.isfile(value):
+            ret = {}
+            ret['result'] = False
+            ret['comment'] = value + " does not exist"
+            return ret
+        
+        if not salt.utils.istextfile(value):
+            ret = {}
+            ret['result'] = False
+            ret['comment'] = value + " is not a text file"
+            return ret
+
+        should = open(value,'r').read()
+    else:
+        should = value
+
     if not __salt__['consul.key_get'](name, **kwargs):
-        __salt__['consul.key_put'](name, value, **kwargs)
+        __salt__['consul.key_put'](name, value, value_from_file, **kwargs)
         ret['changes'][name] = 'Key created'
         ret['comment'] = 'Key "%s" set with value "%s"' % (name, value)
 
-    elif __salt__['consul.key_get'](name, **kwargs) != value:
-        __salt__['consul.key_put'](name, value, **kwargs)
+    elif __salt__['consul.key_get'](name, **kwargs) != should:
+        __salt__['consul.key_put'](name, value, value_from_file, **kwargs)
         ret['changes'][name] = 'Value updated'
         ret['comment'] = 'Key "%s" updated with value "%s"' % (name, value)
     
@@ -96,4 +115,3 @@ def absent(name, recurse=False, **kwargs):
         ret['comment'] = 'Key "%s" deleted' % (name)
     
     return ret
-    
