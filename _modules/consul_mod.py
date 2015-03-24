@@ -161,7 +161,7 @@ def service_list(catalog=False, dc=None, index=None, **kwargs):
     return services
 
 
-def service_get(name, dc=None, tag=None, index=None, **kwargs):
+def service_get(name=None, service_id=None, dc=None, tag=None, index=None, **kwargs):
     '''
     Get a Consul service's details
 
@@ -173,7 +173,7 @@ def service_get(name, dc=None, tag=None, index=None, **kwargs):
     '''
     c = _connect(**kwargs)
     for service, data in c.agent.services().items():
-        if name == service:
+        if ('ID' in data and data['ID'] == service_id) or ('Name' in data and data['Name'] == name):
             return data
     return False
 
