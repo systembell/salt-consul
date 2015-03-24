@@ -74,7 +74,7 @@ def present(name, service_id=None, port=None, tags=None, script=None, interval=N
            'result': True,
            'comment': 'Service "%s" updated' % (name)}
 
-    if not __salt__['consul.service_get'](name):
+    if not __salt__['consul.service_get'](name, service_id):
         __salt__['consul.service_register'](name, service_id, port, tags, script, interval, ttl)
         ret['changes'][name] = 'Service created'
         ret['comment'] = 'Service "%s" created' % (name)
